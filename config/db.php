@@ -7,7 +7,7 @@ $database = getenv('DB_NAME');
 $username = getenv('DB_USER');
 $password = getenv('DB_PASS');
 
-$dsn = "sqlsrv:Server=$server,$port;Database=$database;Encrypt=yes;TrustServerCertificate=yes"; // 加上 TrustServerCertificate=yes
+$dsn = "sqlsrv:Server=$serverName,$port;Database=$database;Encrypt=yes;TrustServerCertificate=yes"; // 加上 TrustServerCertificate=yes
 
 try {
     $conn = new PDO($dsn, $username, $password, [
