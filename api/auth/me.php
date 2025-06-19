@@ -1,7 +1,9 @@
 <?php
 session_start();
-header("Access-Control-Allow-Origin: *"); // 允許跨來源（可限制為你的前端網址）
-header("Access-Control-Allow-Credentials: true"); // 支援跨域 cookie
+header("Access-Control-Allow-Origin: https://db-finalproject.onrender.com");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
 // ✅ 檢查是否登入
