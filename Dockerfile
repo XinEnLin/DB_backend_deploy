@@ -1,7 +1,7 @@
-# 使用 PHP 8.3 + Apache 官方映像
+# 使用 PHP 8.3 + Apache
 FROM php:8.3-apache
 
-# 安裝基本依賴
+# 安裝工具與依賴
 RUN apt-get update && apt-get install -y \
     gnupg2 \
     curl \
@@ -19,19 +19,17 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     unzip
 
-# 加入 Microsoft ODBC Driver 的來源（Debian 12）
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list
+# ✅ 安裝 Microsoft ODBC Driver 18（修正版）
+RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg && \
+    echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
-# 安裝 Microsoft ODBC Driver 18
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18
-
-# 安裝 sqlsrv 與 pdo_sqlsrv PHP 擴充
+# 安裝 PHP SQLSRV 擴充
 RUN pecl install sqlsrv pdo_sqlsrv && \
     docker-php-ext-enable sqlsrv pdo_sqlsrv
 
 # 啟用 Apache rewrite 模組
 RUN a2enmod rewrite
 
-# 複製 PHP 專案到 Apache 根目錄
+# 複製網站程式碼
 COPY . /var/www/html/
