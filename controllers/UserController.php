@@ -2,41 +2,29 @@
 require_once(__DIR__ . '/../models/User.php');
 
 class UserController {
-    private $conn;
+    private $userModel;
+
     public function __construct($conn) {
-        $this->conn = $conn;
+        $this->userModel = new User($conn);
     }
 
     public function apiLogin($data) {
-        $userModel = new User($this->conn);
-        $user = $userModel->login($data['username'], $data['password']);
-        if ($user) {
-            session_start();
-            $_SESSION['user_id'] = $user['id'] ?? $user['userID'] ?? null;
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = ($user['username'] === 'boss') ? 'boss' : 'user';
+        $account = $data['account'];
+        $password = $data['password'];
+
+        $result = $this->userModel->login($account, $password);
+
+        if ($result) {
             echo json_encode([
                 'success' => true,
-                'message' => '登入成功',
-                'role' => $_SESSION['role'],
-                'username' => $_SESSION['username']
-            ]);
+                'message' => '✅ 登入成功',
+                'user' => $result
+            ], JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['success' => false, 'message' => '帳號或密碼錯誤']);
+            echo json_encode([
+                'success' => false,
+                'message' => '帳號或密碼錯誤'
+            ], JSON_UNESCAPED_UNICODE);
         }
-    }
-
-
-    public function apiRegister($data) {
-        $user = new User($this->conn);
-        $msg = $user->register($data['username'], $data['email'], $data['password'], $data['address'], $data['phone']);
-        $success = (strpos($msg, '成功') !== false);
-        echo json_encode(['success' => $success, 'message' => $msg]);
-    }
-
-    public function apiLogout() {
-        session_unset();
-        session_destroy();
-        echo json_encode(['success' => true, 'message' => '已登出']);
     }
 }
