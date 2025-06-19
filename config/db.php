@@ -1,26 +1,31 @@
 <?php
-// $serverName = "157.230.191.17";
-$serverName = "157.230.191.17,1433";
-$database = "DB_finalProject";
-$username = "sa";
-$password = "77888787xxx";
+header('Content-Type: application/json');
 
-try {
-    // 建立 PDO 連線
-    $conn = new PDO("sqlsrv:Server=$serverName;Database=$database", $username, $password);
-    
-    // 設定錯誤模式為拋出例外
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$serverName = getenv('DB_HOST') . "," . getenv('DB_PORT');
+$connectionOptions = [
+    "Database" => getenv('DB_NAME'),
+    "Uid" => getenv('DB_USER'),
+    "PWD" => getenv('DB_PASS'),
+    "Encrypt" => true,
+    "TrustServerCertificate" => true
+];
 
-    // 如果需要設定編碼（sqlsrv 不需要設定 utf8）
-    // $conn->exec("SET NAMES 'utf8'");
+// 嘗試連線 SQL Server
+$conn = sqlsrv_connect($serverName, $connectionOptions);
 
-    // 可以寫 log 或測試
-    // echo "✅ 成功連線到 SQL Server";
-} catch (PDOException $e) {
-     // 連線錯誤直接回傳 JSON
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => '資料庫連線失敗']);
+// 檢查連線狀態
+if (!$conn) {
+    $errors = sqlsrv_errors();
+    echo json_encode([
+        "success" => false,
+        "message" => "❌ 資料庫連線失敗",
+        "errors" => $errors  // 印出完整錯誤細節
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
-?>
+
+// 成功連線
+echo json_encode([
+    "success" => true,
+    "message" => "✅ 成功連線到 SQL Server"
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
