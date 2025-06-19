@@ -1,25 +1,14 @@
 <?php
-header('Content-Type: application/json');
-
-$serverName = getenv('DB_HOST');
-$port = getenv('DB_PORT');
-$database = getenv('DB_NAME');
-$username = getenv('DB_USER');  
-$password = getenv('DB_PASS');
-
-$dsn = "sqlsrv:Server=$serverName,$port;Database=$database;Encrypt=yes;TrustServerCertificate=yes"; // 加上 TrustServerCertificate=yes
+$host = 'localhost';                 // 通常是 localhost
+$dbname = 'DB_finalProject';         // 改成你的資料庫名稱
+$username = 'sa';                    // SQL Server 帳號
+$password = '77888787xxx';         // SQL Server 密碼
 
 try {
-    $conn = new PDO($dsn, $username, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
+    $conn = new PDO("sqlsrv:Server=$host;Database=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // 若要 UTF-8 請確認資料表是 nvarchar 或 ntext 格式
 } catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode([
-        "success" => false,
-        "message" => "❌ 資料庫連線失敗",
-        "error" => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
+    die("連線失敗: " . $e->getMessage());
 }
 ?>
