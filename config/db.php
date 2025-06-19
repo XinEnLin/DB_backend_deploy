@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 $serverName = getenv('DB_HOST');
 $port = getenv('DB_PORT');
 $database = getenv('DB_NAME');
-$username = getenv('DB_USER');
+$username = getenv('DB_USER');  
 $password = getenv('DB_PASS');
 
 $dsn = "sqlsrv:Server=$serverName,$port;Database=$database;Encrypt=yes;TrustServerCertificate=yes"; // 加上 TrustServerCertificate=yes
