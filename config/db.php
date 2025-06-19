@@ -10,21 +10,18 @@ $connectionOptions = [
     "TrustServerCertificate" => true
 ];
 
-// 嘗試連線 SQL Server
-$conn = sqlsrv_connect($serverName, $connectionOptions);
+$conn = @sqlsrv_connect($serverName, $connectionOptions); // ← 加上 @ 防止 PHP 直接中斷
 
-// 檢查連線狀態
 if (!$conn) {
     $errors = sqlsrv_errors();
     echo json_encode([
         "success" => false,
         "message" => "❌ 資料庫連線失敗",
-        "errors" => $errors  // 印出完整錯誤細節
+        "errors" => $errors ? $errors : "無法取得錯誤細節"
     ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
-// 成功連線
 echo json_encode([
     "success" => true,
     "message" => "✅ 成功連線到 SQL Server"
