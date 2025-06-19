@@ -1,33 +1,21 @@
 <?php
-header('Content-Type: application/json');
-
-// 取得環境變數
-$server = getenv('DB_HOST');
+$serverName = getenv('DB_HOST');
 $port = getenv('DB_PORT');
-$dbName = getenv('DB_NAME');
-$dbUser = getenv('DB_USER');
-$dbPass = getenv('DB_PASS');
+$database = getenv('DB_NAME');
+$username = getenv('DB_USER');
+$password = getenv('DB_PASS');
 
 try {
-    // 使用 PDO_SQLSRV 建立連線
-    $dsn = "sqlsrv:Server=$server,$port;Database=$dbName;Encrypt=true;TrustServerCertificate=true";
-    $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // 啟用錯誤拋出
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ];
-
-    $conn = new PDO($dsn, $dbUser, $dbPass, $options);
-
-    echo json_encode([
-        "success" => true,
-        "message" => "✅ 成功連線到 SQL Server"
-    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-
+    $conn = new PDO("sqlsrv:Server=$serverName,$port;Database=$database", $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
 } catch (PDOException $e) {
+    http_response_code(500);
     echo json_encode([
         "success" => false,
         "message" => "❌ 資料庫連線失敗",
         "error" => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
+?>
